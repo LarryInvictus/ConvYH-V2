@@ -1,63 +1,99 @@
 body {
     margin: 0;
+    overflow: hidden;
     font-family: Arial, sans-serif;
-    background: radial-gradient(circle at top, #2b0a4a, #0d0220);
+    background: #0a0018;
     color: white;
-    overflow-x: hidden;
 }
 
-.container {
-    width: 90%;
-    max-width: 700px;
-    margin: auto;
-    text-align: center;
-    padding-top: 60px;
+/* Browser Frame */
+.browser {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 80%;
+    background: rgba(20, 0, 40, 0.7);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.1);
+    padding: 20px;
 }
+
+.browser-top {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+.red { background: #ff5f57; }
+.yellow { background: #ffbd2e; }
+.green { background: #28c840; }
 
 .title {
-    font-size: 48px;
+    margin-top: 20px;
+    font-size: 32px;
     font-weight: bold;
-    margin-bottom: 10px;
+    text-align: center;
 }
 
 .subtitle {
+    text-align: center;
+    opacity: 0.7;
+    margin-bottom: 20px;
+}
+
+.input {
+    width: 80%;
+    margin: 10px auto;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
     font-size: 18px;
-    opacity: 0.8;
-    margin-bottom: 40px;
-}
-
-.card {
-    background: rgba(255,255,255,0.08);
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    backdrop-filter: blur(10px);
-}
-
-.card input {
-    width: 70%;
-    padding: 12px;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    margin-right: 10px;
-}
-
-.card button {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    background: #7a3cff;
+    display: block;
+    background: rgba(255,255,255,0.1);
     color: white;
+}
+
+.request-btn {
+    width: 200px;
+    margin: 20px auto;
+    padding: 12px;
+    background: #6a00ff;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 18px;
+    display: block;
     cursor: pointer;
-    transition: 0.2s;
 }
 
-.card button:hover {
-    background: #9b5cff;
+.nav {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
 }
 
-.footer {
-    margin-top: 40px;
-    opacity: 0.8;
-  }
+.nav-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+}
+
+/* Particle Canvas */
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
