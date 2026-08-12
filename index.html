@@ -7,32 +7,28 @@
 </head>
 <body>
 
-<div class="container">
-    <h1 class="title">ConvYH V2</h1>
-    <p class="subtitle">Your unified proxy + game hub</p>
+<canvas id="particles"></canvas>
 
-    <div class="card">
-        <input id="proxySearch" type="text" placeholder="Search the web with proxy...">
-        <button onclick="launchProxy()">Go</button>
+<div class="browser">
+    <div class="browser-top">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
     </div>
 
-    <div class="card">
-        <h2>Proxy Hub</h2>
-        <button onclick="openProxy('https://google.com')">Google</button>
-        <button onclick="openProxy('https://youtube.com')">YouTube</button>
-        <button onclick="openProxy('https://reddit.com')">Reddit</button>
-    </div>
+    <div class="title">ConvYH V2</div>
+    <div class="subtitle">"undefined"</div>
 
-    <div class="card">
-        <h2>Game Hub</h2>
-        <button onclick="openGame('https://example.com/game1')">Game 1</button>
-        <button onclick="openGame('https://example.com/game2')">Game 2</button>
-        <button onclick="openGame('https://example.com/game3')">Game 3</button>
-    </div>
+    <input class="input" placeholder="Search the web ...">
+    <input class="input" placeholder="Join the disc for more links">
 
-    <div class="footer">
-        <p>Join the Discord for more links</p>
-        <button onclick="requestLink()">Request</button>
+    <button class="request-btn">Request</button>
+
+    <div class="nav">
+        <div class="nav-icon"></div>
+        <div class="nav-icon"></div>
+        <div class="nav-icon"></div>
+        <div class="nav-icon"></div>
     </div>
 </div>
 
