@@ -13,7 +13,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     width: 80%;
-    height: 80%;
+    height: 75%;
     background: rgba(20, 0, 40, 0.7);
     border-radius: 12px;
     backdrop-filter: blur(10px);
@@ -52,7 +52,7 @@ body {
 
 .input {
     width: 80%;
-    margin: 10px auto;
+    margin: 20px auto;
     padding: 14px;
     border-radius: 8px;
     border: none;
