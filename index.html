@@ -1,288 +1,140 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>System Diagnostics</title> <!-- Stealth title -->
+<title>ConvYH V2 Proxy Browser</title>
 <style>
-/* Stealth mode: looks like a system panel */
 body {
-    background: #050505;
+    background: #0a0a0a;
     color: #e0e0e0;
-    font-family: "Segoe UI", Arial, sans-serif;
+    font-family: Arial, sans-serif;
     margin: 0;
 }
 #topbar {
-    background: #0b0b0b;
-    padding: 8px 12px;
+    background: #111;
+    padding: 10px;
     display: flex;
+    gap: 10px;
     align-items: center;
-    gap: 8px;
-    box-shadow: 0 0 12px rgba(0,0,0,0.8);
-}
-#logo {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #4cff4c, #008000);
-    box-shadow: 0 0 8px #4cff4c;
-}
-#title {
-    font-size: 13px;
-    color: #9f9f9f;
 }
 #url {
     flex: 1;
-    padding: 6px 10px;
-    border-radius: 4px;
-    border: 1px solid #222;
-    background: #101010;
-    color: #e0e0e0;
-    font-size: 12px;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    background: #222;
+    color: white;
 }
 button {
-    padding: 6px 14px;
-    background: #1f4fff;
+    padding: 10px 20px;
+    background: #3a3aff;
     border: none;
-    border-radius: 4px;
-    color: #fff;
-    font-size: 12px;
+    border-radius: 6px;
+    color: white;
     cursor: pointer;
-}
-button:hover {
-    background: #3a63ff;
 }
 #tabs {
     display: flex;
-    gap: 4px;
-    padding: 6px 10px;
-    background: #080808;
-    border-bottom: 1px solid #181818;
+    gap: 6px;
+    padding: 10px;
+    background: #0f0f0f;
 }
 .tab {
-    padding: 4px 10px;
-    font-size: 11px;
+    padding: 6px 12px;
+    background: #1c1c1c;
     border-radius: 4px;
-    background: #111;
-    color: #aaa;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    color: #ccc;
 }
 .tab.active {
-    background: #1c1c1c;
+    background: #333;
     color: #fff;
-    box-shadow: 0 0 8px rgba(0,0,0,0.7);
-}
-.tab span.close {
-    font-size: 11px;
-    color: #666;
-}
-.tab span.close:hover {
-    color: #ff4c4c;
 }
 #view {
-    padding: 16px;
+    padding: 20px;
     background: #050505;
-    height: calc(100vh - 70px);
+    height: calc(100vh - 120px);
     overflow-y: auto;
-    border-top: 1px solid #181818;
-    filter: blur(0px);
-    transition: filter 0.2s ease;
 }
 #view.stealth {
-    filter: blur(4px); /* quick stealth blur */
-}
-#status {
-    position: fixed;
-    bottom: 6px;
-    right: 10px;
-    font-size: 10px;
-    color: #555;
+    filter: blur(5px);
 }
 </style>
 </head>
 <body>
 
 <div id="topbar">
-    <div id="logo"></div>
-    <div id="title">System Diagnostics Panel</div>
-    <input id="url" placeholder="https://example.com">
-    <button onclick="openTab()">New Tab</button>
+    <input id="url" placeholder="Enter URL (https://example.com)">
+    <button onclick="newTab()">Open</button>
     <button onclick="toggleStealth()">Stealth</button>
 </div>
 
 <div id="tabs"></div>
-<div id="view">ConvYH V2 Secure Proxy Ready.</div>
-<div id="status">Status: idle</div>
+<div id="view">ConvYH V2 Ready.</div>
 
 <script>
-// Shared secret (must match server.js)
-const SECRET = "convYH_V2_secret_key_123";
+const API_URL = "https://api.apify.com/v2/acts/jkG4dEgaIazTU7dWu/run-sync?token=YOUR_API_KEY_HERE";
 
 let tabs = [];
-let activeTabId = null;
+let activeTab = null;
 
-// Simple AES encryption in browser (CryptoJS-like minimal)
-async function encryptPayload(obj) {
-    const text = JSON.stringify(obj);
-    const enc = new TextEncoder().encode(text);
-
-    const keyMaterial = await crypto.subtle.importKey(
-        "raw",
-        new TextEncoder().encode(SECRET),
-        { name: "PBKDF2" },
-        false,
-        ["deriveKey"]
-    );
-
-    const key = await crypto.subtle.deriveKey(
-        {
-            name: "PBKDF2",
-            salt: new TextEncoder().encode("convYH_salt"),
-            iterations: 1000,
-            hash: "SHA-256"
-        },
-        keyMaterial,
-        { name: "AES-CBC", length: 256 },
-        false,
-        ["encrypt"]
-    );
-
-    const iv = crypto.getRandomValues(new Uint8Array(16));
-    const encrypted = await crypto.subtle.encrypt(
-        { name: "AES-CBC", iv },
-        key,
-        enc
-    );
-
-    const combined = new Uint8Array(iv.byteLength + encrypted.byteLength);
-    combined.set(iv, 0);
-    combined.set(new Uint8Array(encrypted), iv.byteLength);
-
-    return btoa(String.fromCharCode(...combined));
-}
-
-async function decryptPayload(base64) {
-    const binary = atob(base64);
-    const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
-    const iv = bytes.slice(0, 16);
-    const data = bytes.slice(16);
-
-    const keyMaterial = await crypto.subtle.importKey(
-        "raw",
-        new TextEncoder().encode(SECRET),
-        { name: "PBKDF2" },
-        false,
-        ["deriveKey"]
-    );
-
-    const key = await crypto.subtle.deriveKey(
-        {
-            name: "PBKDF2",
-            salt: new TextEncoder().encode("convYH_salt"),
-            iterations: 1000,
-            hash: "SHA-256"
-        },
-        keyMaterial,
-        { name: "AES-CBC", length: 256 },
-        false,
-        ["decrypt"]
-    );
-
-    const decrypted = await crypto.subtle.decrypt(
-        { name: "AES-CBC", iv },
-        key,
-        data
-    );
-
-    return JSON.parse(new TextDecoder().decode(decrypted));
-}
-
-// Tabs
 function renderTabs() {
     const tabsDiv = document.getElementById("tabs");
     tabsDiv.innerHTML = "";
-    tabs.forEach(tab => {
+    tabs.forEach(t => {
         const el = document.createElement("div");
-        el.className = "tab" + (tab.id === activeTabId ? " active" : "");
-        el.onclick = () => setActiveTab(tab.id);
-        el.innerHTML = `
-            <span>${tab.title}</span>
-            <span class="close" onclick="closeTab(event, '${tab.id}')">×</span>
-        `;
+        el.className = "tab" + (t.id === activeTab ? " active" : "");
+        el.innerText = t.title;
+        el.onclick = () => switchTab(t.id);
         tabsDiv.appendChild(el);
     });
 }
 
-function setActiveTab(id) {
-    activeTabId = id;
+function switchTab(id) {
+    activeTab = id;
     const tab = tabs.find(t => t.id === id);
-    if (!tab) return;
-    document.getElementById("view").innerHTML = tab.content || "Empty tab.";
+    document.getElementById("view").innerHTML = tab.content;
     renderTabs();
 }
 
-function closeTab(e, id) {
-    e.stopPropagation();
-    tabs = tabs.filter(t => t.id !== id);
-    if (activeTabId === id) {
-        activeTabId = tabs.length ? tabs[0].id : null;
-    }
-    if (!activeTabId) {
-        document.getElementById("view").innerHTML = "No tabs open.";
-    } else {
-        setActiveTab(activeTabId);
-    }
-    renderTabs();
-}
-
-async function openTab() {
+async function newTab() {
     const url = document.getElementById("url").value.trim();
     if (!url) return;
 
-    const id = "tab_" + Date.now();
-    const tab = { id, title: url.replace(/^https?:\/\//, "").slice(0, 18), content: "Loading..." };
+    const id = Date.now();
+    const tab = {
+        id,
+        title: url.slice(0, 20),
+        content: "Loading..."
+    };
+
     tabs.push(tab);
-    activeTabId = id;
+    activeTab = id;
     renderTabs();
-    document.getElementById("view").innerHTML = "Loading via secure proxy...";
-    document.getElementById("status").innerText = "Status: requesting";
+    document.getElementById("view").innerHTML = "Loading...";
 
     try {
-        const encrypted = await encryptPayload({ url });
-        const res = await fetch("http://localhost:3000/proxy", {
+        const res = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ data: encrypted })
+            body: JSON.stringify({ url })
         });
 
-        const json = await res.json();
-        const decrypted = await decryptPayload(json.data);
+        const data = await res.json();
+        tab.content = data.output.body || "No content returned.";
 
-        if (decrypted.error) {
-            tab.content = "<b>Error:</b> " + decrypted.error;
-        } else {
-            tab.content = decrypted.content;
-        }
-        if (activeTabId === id) {
+        if (activeTab === id) {
             document.getElementById("view").innerHTML = tab.content;
         }
-        document.getElementById("status").innerText = "Status: done";
         renderTabs();
     } catch (err) {
-        tab.content = "<b>Client error:</b> " + err;
-        if (activeTabId === id) {
-            document.getElementById("view").innerHTML = tab.content;
-        }
-        document.getElementById("status").innerText = "Status: error";
+        tab.content = "Error: " + err;
+        document.getElementById("view").innerHTML = tab.content;
         renderTabs();
     }
 }
 
-// Stealth blur toggle
 function toggleStealth() {
-    const view = document.getElementById("view");
-    view.classList.toggle("stealth");
+    document.getElementById("view").classList.toggle("stealth");
 }
 </script>
 
