@@ -1,36 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>ConvYH V2</title>
-    <link rel="stylesheet" href="style.css">
+<title>ConvYH V2 Proxy Browser</title>
+<style>
+body {
+    background: #0f0f0f;
+    color: white;
+    font-family: Arial;
+    margin: 0;
+}
+#topbar {
+    background: #1a1a1a;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+}
+#url {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    background: #222;
+    color: white;
+}
+button {
+    padding: 10px 20px;
+    background: #3a3aff;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+}
+#view {
+    padding: 20px;
+    background: #111;
+    height: calc(100vh - 70px);
+    overflow-y: auto;
+    border-top: 2px solid #333;
+}
+</style>
 </head>
 <body>
 
-<canvas id="particles"></canvas>
-
-<div class="browser">
-    <div class="browser-top">
-        <div class="dot red"></div>
-        <div class="dot yellow"></div>
-        <div class="dot green"></div>
-    </div>
-
-    <div class="title">ConvYH V2</div>
-    <div class="subtitle">"undefined"</div>
-
-    <input class="input" placeholder="Search the web ...">
-
-    <button class="request-btn">Request</button>
-
-    <div class="nav">
-        <div class="nav-icon"></div>
-        <div class="nav-icon"></div>
-        <div class="nav-icon"></div>
-        <div class="nav-icon"></div>
-    </div>
+<div id="topbar">
+    <input id="url" placeholder="Enter URL (https://example.com)">
+    <button onclick="go()">Go</button>
 </div>
 
-<script src="script.js"></script>
+<div id="view">ConvYH V2 Proxy Browser Ready.</div>
+
+<script>
+async function go() {
+    const input = document.getElementById("url").value;
+
+    const res = await fetch("http://localhost:3000/proxy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: input })
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+        document.getElementById("view").innerHTML =
+            "<b>Error:</b> " + data.error;
+        return;
+    }
+
+    document.getElementById("view").innerHTML = data.content;
+}
+</script>
+
 </body>
 </html>
