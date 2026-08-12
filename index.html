@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ConvYH V2</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1 class="title">ConvYH V2</h1>
+    <p class="subtitle">Your unified proxy + game hub</p>
+
+    <div class="card">
+        <input id="proxySearch" type="text" placeholder="Search the web with proxy...">
+        <button onclick="launchProxy()">Go</button>
+    </div>
+
+    <div class="card">
+        <h2>Proxy Hub</h2>
+        <button onclick="openProxy('https://google.com')">Google</button>
+        <button onclick="openProxy('https://youtube.com')">YouTube</button>
+        <button onclick="openProxy('https://reddit.com')">Reddit</button>
+    </div>
+
+    <div class="card">
+        <h2>Game Hub</h2>
+        <button onclick="openGame('https://example.com/game1')">Game 1</button>
+        <button onclick="openGame('https://example.com/game2')">Game 2</button>
+        <button onclick="openGame('https://example.com/game3')">Game 3</button>
+    </div>
+
+    <div class="footer">
+        <p>Join the Discord for more links</p>
+        <button onclick="requestLink()">Request</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
